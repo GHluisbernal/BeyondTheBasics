@@ -2,16 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public delegate void TextOutputHandler(string text);
 public class GameSceneController : MonoBehaviour
 {
+    [Header("Player Settings")]
+    [Range(5, 20)]
     public float playerSpeed = 10;
+    [Header("Screen Settings")]
     public Vector3 screenBounds;
-    public EnemyController enemyPrefab;
+
+    [Header("Prefab")]
+    [SerializeField]
+    private EnemyController enemyPrefab;
+
+    private HUDController hudController;
+    private int totalScore;
 
     // Start is called before the first frame update
     void Start()
     {
+
+        hudController = FindObjectOfType<HUDController>();
         screenBounds = GetScreenBounds();
+
         StartCoroutine(SpawnEnemies());
     }
 
@@ -36,14 +49,34 @@ public class GameSceneController : MonoBehaviour
         {
             var horizontalPosition = Random.Range(-screenBounds.x, screenBounds.x);
             var spawnPosition = new Vector2(horizontalPosition, screenBounds.y);
-            Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+            var enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+
+            enemy.EnemyEscaped += EnemyAtBottom;
+            enemy.EnemyKilled += EnemyKilled;
+
             yield return wait;
         }
     }
 
+    private void EnemyKilled(int pointValue)
+    {
+        totalScore += pointValue;
+        hudController.scoreText.text = totalScore.ToString();
+    }
+
+    private void EnemyAtBottom(EnemyController enemy)
+    {
+        Destroy(enemy.gameObject);
+        Debug.Log("Enemy Escaped");
+    }
+
     public void KillObject(IKillable killable)
     {
-        Debug.LogWarningFormat("{0} killed by Game Scene Controller", killable.GetName());
         killable.Kill();
+    }
+
+    public void OutputText(string output)
+    {
+        Debug.LogFormat("{0} output by GameSceneController", output);
     }
 }
