@@ -6,6 +6,12 @@ public class PlayerController : Shape
 {
     public ProjectileController projectileController;
 
+    protected override void Start()
+    {
+        base.Start();
+        SetColor(Color.yellow);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -34,6 +40,5 @@ public class PlayerController : Shape
     {
         var spawnPosition = transform.position;
         var projectile = Instantiate(projectileController, spawnPosition, Quaternion.identity);
-        projectile.projectileSpeed = 2;
     }
 }

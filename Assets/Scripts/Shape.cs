@@ -9,7 +9,7 @@ public class Shape : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
 
-    private void Start()
+    protected virtual void Start()
     {
         gameSceneController = FindObjectOfType<GameSceneController>();
         spriteRenderer = GetComponent<SpriteRenderer>();
